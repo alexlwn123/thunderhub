@@ -295,6 +295,16 @@ type DecodeInvoice {
   tokens: Float!
 }
 
+type Event {
+  content: String!
+  created_at: Float!
+  id: String!
+  kind: Float!
+  pubkey: String!
+  sig: String!
+  tags: [[String!]!]!
+}
+
 type FeeHealth {
   base: String
   baseOver: Boolean
@@ -437,6 +447,7 @@ type Mutation {
   createMacaroon(permissions: NetworkInfoInput!): CreateMacaroon!
   createThunderPoints(alias: String!, id: String!, public_key: String!, uris: [String!]!): Boolean!
   fetchLnUrl(url: String!): LnUrlRequest!
+  generateProfile(privateKey: String!): Event!
   getAuthToken(cookie: String): Boolean!
   getSessionToken(id: String!, password: String!, token: String): String!
   keysend(destination: String, tokens: Float!): PayInvoice!
@@ -713,6 +724,7 @@ type Query {
   getPayments(token: String): GetPaymentsType!
   getPeers: [Peer!]!
   getPendingChannels: [PendingChannel!]!
+  getRelays: Relays!
   getServerAccounts: [ServerAccount!]!
   getTimeHealth: ChannelsTimeHealth!
   getTwofaSecret: TwofaResult!
@@ -724,6 +736,10 @@ type Query {
   verifyBackup(backup: String!): Boolean!
   verifyBackups(backup: String!): Boolean!
   verifyMessage(message: String!, signature: String!): String!
+}
+
+type Relays {
+  urls: [String!]!
 }
 
 type Route {

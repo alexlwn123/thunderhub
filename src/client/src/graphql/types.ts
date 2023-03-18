@@ -344,6 +344,17 @@ export type DecodeInvoice = {
   tokens: Scalars['Float'];
 };
 
+export type Event = {
+  __typename?: 'Event';
+  content: Scalars['String'];
+  created_at: Scalars['Float'];
+  id: Scalars['String'];
+  kind: Scalars['Float'];
+  pubkey: Scalars['String'];
+  sig: Scalars['String'];
+  tags: Array<Array<Scalars['String']>>;
+};
+
 export type FeeHealth = {
   __typename?: 'FeeHealth';
   base?: Maybe<Scalars['String']>;
@@ -502,6 +513,7 @@ export type Mutation = {
   createMacaroon: CreateMacaroon;
   createThunderPoints: Scalars['Boolean'];
   fetchLnUrl: LnUrlRequest;
+  generateProfile: Event;
   getAuthToken: Scalars['Boolean'];
   getSessionToken: Scalars['String'];
   keysend: PayInvoice;
@@ -596,6 +608,10 @@ export type MutationCreateThunderPointsArgs = {
 
 export type MutationFetchLnUrlArgs = {
   url: Scalars['String'];
+};
+
+export type MutationGenerateProfileArgs = {
+  privateKey: Scalars['String'];
 };
 
 export type MutationGetAuthTokenArgs = {
@@ -975,6 +991,7 @@ export type Query = {
   getPayments: GetPaymentsType;
   getPeers: Array<Peer>;
   getPendingChannels: Array<PendingChannel>;
+  getRelays: Relays;
   getServerAccounts: Array<ServerAccount>;
   getTimeHealth: ChannelsTimeHealth;
   getTwofaSecret: TwofaResult;
@@ -1064,6 +1081,11 @@ export type QueryVerifyBackupsArgs = {
 export type QueryVerifyMessageArgs = {
   message: Scalars['String'];
   signature: Scalars['String'];
+};
+
+export type Relays = {
+  __typename?: 'Relays';
+  urls: Array<Scalars['String']>;
 };
 
 export type Route = {
