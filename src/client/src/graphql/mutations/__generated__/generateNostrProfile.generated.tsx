@@ -10,27 +10,51 @@ export type NostrEventMutationVariables = Types.Exact<{
 export type NostrEventMutation = {
   __typename?: 'Mutation';
   generateNostrProfile: {
-    __typename?: 'NostrEvent';
-    kind: number;
-    tags: Array<Array<string>>;
-    content: string;
-    created_at: number;
-    pubkey: string;
-    id: string;
-    sig: string;
+    __typename?: 'NostrGenerateProfile';
+    profile: {
+      __typename?: 'NostrEvent';
+      kind: number;
+      tags: Array<Array<string>>;
+      content: string;
+      created_at: number;
+      pubkey: string;
+      id: string;
+      sig: string;
+    };
+    announcement: {
+      __typename?: 'NostrEvent';
+      kind: number;
+      tags: Array<Array<string>>;
+      content: string;
+      created_at: number;
+      pubkey: string;
+      id: string;
+      sig: string;
+    };
   };
 };
 
 export const NostrEventDocument = gql`
   mutation NostrEvent($privateKey: String!) {
     generateNostrProfile(privateKey: $privateKey) {
-      kind
-      tags
-      content
-      created_at
-      pubkey
-      id
-      sig
+      profile {
+        kind
+        tags
+        content
+        created_at
+        pubkey
+        id
+        sig
+      }
+      announcement {
+        kind
+        tags
+        content
+        created_at
+        pubkey
+        id
+        sig
+      }
     }
   }
 `;

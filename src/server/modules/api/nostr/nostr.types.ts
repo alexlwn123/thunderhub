@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+// import { Kind } from 'nostr-tools';
 
 @ObjectType()
-export class Keys {
+export class NostrKeys {
   @Field()
   pubkey: string;
 
@@ -10,13 +11,13 @@ export class Keys {
 }
 
 @ObjectType()
-export class Relays {
+export class NostrRelays {
   @Field(() => [String])
   urls: Array<string>;
 }
 
 @ObjectType()
-export class Event {
+export class NostrEvent {
   @Field()
   kind: number;
 
@@ -37,4 +38,30 @@ export class Event {
 
   @Field()
   sig: string;
+}
+
+@ObjectType()
+export class NostrGenerateProfile {
+  @Field(() => NostrEvent)
+  profile: NostrEvent;
+
+  @Field(() => NostrEvent)
+  announcement: NostrEvent;
+}
+
+// declare interface NostrFilter {
+//   ids?: string[]
+//   kinds?: Kind[]
+//   authors?: string[]
+//   since?: number
+//   until?: number
+//   "#e"?: string[]
+//   "#p"?: string[]
+//   limit?: number
+// }
+
+export interface NostrNodeAttestation {
+  ip: string;
+  s: string;
+  n: string;
 }

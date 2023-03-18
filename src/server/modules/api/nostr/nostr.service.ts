@@ -6,10 +6,11 @@ import { AccountsService } from '../../accounts/accounts.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { LndService } from '../../node/lnd/lnd.service';
+import { NostrNodeAttestation } from './nostr.types';
 
 @Injectable()
 export class NostrService {
-  relays = ['wss://nos.lol'];
+  relays = ['wss://e.nos.lol'];
 
   connectedRelays: Relay[] = [];
   constructor(
@@ -25,6 +26,9 @@ export class NostrService {
       await relay.connect();
       relay.on('connect', () => {
         this.logger.info(`Connected to ${relay.url}`);
+      });
+      relay.on('error', e => {
+        this.logger.error('No node ', e);
       });
       this.connectedRelays.push(relay);
       resolve(relay);
@@ -50,32 +54,29 @@ export class NostrService {
   }
 
   async generateProfile(privateKey: string, id: string) {
-    console.log('iamgeneratingprofile', privateKey, id);
     return new Promise(async (resolve, reject) => {
       const account = this.accountService.getAccount(id);
       if (!account) throw new Error('Node account not found.');
 
       // get the node info
       const node = await this.lndService.getWalletInfo(account);
-      console.log('node id', node.public_key);
+
       // sign a message of the node pubkey
       const attestation = await this.lndService.signMessage(
         account,
         node.public_key
       );
-      console.log('attestation', attestation);
 
       // Content of our lightning node
       const profileContent = {
         username: node.alias,
         about: 'Auntie LND',
-        ip: node.public_key,
       };
 
       // create kind 0 profile data
       const profile: EventTemplate = {
         kind: Kind.Metadata,
-        tags: [['s', attestation.signature]],
+        tags: [],
         content: JSON.stringify(profileContent),
         created_at: Math.floor(Date.now() / 1000),
       };
@@ -98,12 +99,70 @@ export class NostrService {
 
       createProfile.on('ok', () => {
         this.logger.info(`Created account for node: ${node.public_key}`);
-        resolve(signedProfileEvent);
       });
 
-      createProfile.on('failed', () => {
-        this.logger.error(`Failed to create account for ${node.public_key}`);
+      createProfile.on('failed', e => {
+        this.logger.error(
+          `Failed to create account for ${node.public_key}: ${e}`
+        );
         reject('could not create profile. you fucking loser.');
+      });
+
+      const announcment = await this.createNodeAnnouncement(
+        privateKey,
+        attestation.signature,
+        'regtest',
+        node.public_key
+      );
+      if (!announcment) reject('could not make node announement');
+
+      resolve({ profile: signedProfileEvent, announcement: announcment });
+    });
+  }
+
+  private async createNodeAnnouncement(
+    privateKey,
+    attestation,
+    network,
+    pubkey
+  ) {
+    return new Promise(resolve => {
+      const nodeAttestation: NostrNodeAttestation = {
+        ip: pubkey,
+        s: attestation,
+        n: network,
+      };
+
+      const nodeAnnouncement: EventTemplate = {
+        kind: 80081,
+        tags: [],
+        content: JSON.stringify(nodeAttestation),
+        created_at: Math.floor(Date.now() / 1000),
+      };
+
+      const nodeAnnouncementUnsigned: UnsignedEvent = {
+        ...nodeAnnouncement,
+        pubkey: nostr.getPublicKey(privateKey),
+      };
+
+      const nodeAnnouncementEvent: Event = {
+        ...nodeAnnouncementUnsigned,
+        id: nostr.getEventHash(nodeAnnouncementUnsigned),
+        sig: nostr.signEvent(nodeAnnouncementUnsigned, privateKey),
+      };
+
+      const announceNode = this.connectedRelays[0].publish(
+        nodeAnnouncementEvent
+      );
+
+      announceNode.on('ok', () => {
+        this.logger.info(`Created node announcement event for ${pubkey}`);
+        resolve(nodeAnnouncementEvent);
+      });
+
+      announceNode.on('failed', e => {
+        this.logger.error('Could not announce node.', e);
+        resolve(null);
       });
     });
   }

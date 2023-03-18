@@ -432,7 +432,7 @@ type Mutation {
   createMacaroon(permissions: NetworkInfoInput!): CreateMacaroon!
   createThunderPoints(alias: String!, id: String!, public_key: String!, uris: [String!]!): Boolean!
   fetchLnUrl(url: String!): LnUrlRequest!
-  generateNostrProfile(privateKey: String!): NostrEvent!
+  generateNostrProfile(privateKey: String!): NostrGenerateProfile!
   getAuthToken(cookie: String): Boolean!
   getSessionToken(id: String!, password: String!, token: String): String!
   keysend(destination: String, tokens: Float!): PayInvoice!
@@ -551,6 +551,11 @@ type NostrEvent {
   pubkey: String!
   sig: String!
   tags: [[String!]!]!
+}
+
+type NostrGenerateProfile {
+  announcement: NostrEvent!
+  profile: NostrEvent!
 }
 
 type NostrKeys {

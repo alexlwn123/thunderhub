@@ -2,7 +2,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from '../../security/security.decorators';
 import { UserId } from '../../security/security.types';
 import { NostrService } from './nostr.service';
-import { NostrEvent, NostrKeys, NostrRelays } from './nostr.types';
+import { NostrGenerateProfile, NostrKeys, NostrRelays } from './nostr.types';
 
 @Resolver(() => NostrKeys)
 export class KeysResolver {
@@ -27,16 +27,17 @@ export class RelaysResolver {
   }
 }
 
-@Resolver(() => NostrEvent)
+@Resolver(() => NostrGenerateProfile)
 export class EventResolver {
   constructor(private nostrService: NostrService) {}
 
-  @Mutation(() => NostrEvent, { name: 'generateNostrProfile' })
+  @Mutation(() => NostrGenerateProfile, { name: 'generateNostrProfile' })
   async generateNostrProfile(
     @CurrentUser() { id }: UserId,
     @Args('privateKey') privateKey: string
   ) {
     const profile = await this.nostrService.generateProfile(privateKey, id);
+    console.log('dwefwergwergw', profile);
     return profile;
   }
 }

@@ -496,7 +496,7 @@ export type Mutation = {
   createMacaroon: CreateMacaroon;
   createThunderPoints: Scalars['Boolean'];
   fetchLnUrl: LnUrlRequest;
-  generateNostrProfile: NostrEvent;
+  generateNostrProfile: NostrGenerateProfile;
   getAuthToken: Scalars['Boolean'];
   getSessionToken: Scalars['String'];
   keysend: PayInvoice;
@@ -805,6 +805,12 @@ export type NostrEvent = {
   pubkey: Scalars['String'];
   sig: Scalars['String'];
   tags: Array<Array<Scalars['String']>>;
+};
+
+export type NostrGenerateProfile = {
+  __typename?: 'NostrGenerateProfile';
+  announcement: NostrEvent;
+  profile: NostrEvent;
 };
 
 export type NostrKeys = {
