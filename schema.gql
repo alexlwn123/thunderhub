@@ -295,16 +295,6 @@ type DecodeInvoice {
   tokens: Float!
 }
 
-type Event {
-  content: String!
-  created_at: Float!
-  id: String!
-  kind: Float!
-  pubkey: String!
-  sig: String!
-  tags: [[String!]!]!
-}
-
 type FeeHealth {
   base: String
   baseOver: Boolean
@@ -388,11 +378,6 @@ type InvoiceType {
   type: String!
 }
 
-type Keys {
-  privkey: String!
-  pubkey: String!
-}
-
 type LightningAddress {
   lightning_address: String!
   pubkey: String!
@@ -447,7 +432,7 @@ type Mutation {
   createMacaroon(permissions: NetworkInfoInput!): CreateMacaroon!
   createThunderPoints(alias: String!, id: String!, public_key: String!, uris: [String!]!): Boolean!
   fetchLnUrl(url: String!): LnUrlRequest!
-  generateProfile(privateKey: String!): Event!
+  generateNostrProfile(privateKey: String!): NostrEvent!
   getAuthToken(cookie: String): Boolean!
   getSessionToken(id: String!, password: String!, token: String): String!
   keysend(destination: String, tokens: Float!): PayInvoice!
@@ -556,6 +541,25 @@ type NodeSocialInfo {
 type NodeType {
   alias: String!
   public_key: String!
+}
+
+type NostrEvent {
+  content: String!
+  created_at: Float!
+  id: String!
+  kind: Float!
+  pubkey: String!
+  sig: String!
+  tags: [[String!]!]!
+}
+
+type NostrKeys {
+  privkey: String!
+  pubkey: String!
+}
+
+type NostrRelays {
+  urls: [String!]!
 }
 
 type OnChainBalance {
@@ -708,7 +712,6 @@ type Query {
   getHello: String!
   getInvoiceStatusChange(id: String!): String!
   getInvoices(token: String): GetInvoicesType!
-  getKeys: Keys!
   getLatestVersion: String!
   getLightningAddressInfo(address: String!): PayRequest!
   getLightningAddresses: [LightningAddress!]!
@@ -721,10 +724,11 @@ type Query {
   getNodeBalances: Balances!
   getNodeInfo: NodeInfo!
   getNodeSocialInfo(pubkey: String!): LightningNodeSocialInfo!
+  getNostrKeys: NostrKeys!
+  getNostrRelays: NostrRelays!
   getPayments(token: String): GetPaymentsType!
   getPeers: [Peer!]!
   getPendingChannels: [PendingChannel!]!
-  getRelays: Relays!
   getServerAccounts: [ServerAccount!]!
   getTimeHealth: ChannelsTimeHealth!
   getTwofaSecret: TwofaResult!
@@ -736,10 +740,6 @@ type Query {
   verifyBackup(backup: String!): Boolean!
   verifyBackups(backup: String!): Boolean!
   verifyMessage(message: String!, signature: String!): String!
-}
-
-type Relays {
-  urls: [String!]!
 }
 
 type Route {

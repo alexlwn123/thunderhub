@@ -344,17 +344,6 @@ export type DecodeInvoice = {
   tokens: Scalars['Float'];
 };
 
-export type Event = {
-  __typename?: 'Event';
-  content: Scalars['String'];
-  created_at: Scalars['Float'];
-  id: Scalars['String'];
-  kind: Scalars['Float'];
-  pubkey: Scalars['String'];
-  sig: Scalars['String'];
-  tags: Array<Array<Scalars['String']>>;
-};
-
 export type FeeHealth = {
   __typename?: 'FeeHealth';
   base?: Maybe<Scalars['String']>;
@@ -446,12 +435,6 @@ export type InvoiceType = {
   type: Scalars['String'];
 };
 
-export type Keys = {
-  __typename?: 'Keys';
-  privkey: Scalars['String'];
-  pubkey: Scalars['String'];
-};
-
 export type LightningAddress = {
   __typename?: 'LightningAddress';
   lightning_address: Scalars['String'];
@@ -513,7 +496,7 @@ export type Mutation = {
   createMacaroon: CreateMacaroon;
   createThunderPoints: Scalars['Boolean'];
   fetchLnUrl: LnUrlRequest;
-  generateProfile: Event;
+  generateNostrProfile: NostrEvent;
   getAuthToken: Scalars['Boolean'];
   getSessionToken: Scalars['String'];
   keysend: PayInvoice;
@@ -610,7 +593,7 @@ export type MutationFetchLnUrlArgs = {
   url: Scalars['String'];
 };
 
-export type MutationGenerateProfileArgs = {
+export type MutationGenerateNostrProfileArgs = {
   privateKey: Scalars['String'];
 };
 
@@ -813,6 +796,28 @@ export type NodeType = {
   public_key: Scalars['String'];
 };
 
+export type NostrEvent = {
+  __typename?: 'NostrEvent';
+  content: Scalars['String'];
+  created_at: Scalars['Float'];
+  id: Scalars['String'];
+  kind: Scalars['Float'];
+  pubkey: Scalars['String'];
+  sig: Scalars['String'];
+  tags: Array<Array<Scalars['String']>>;
+};
+
+export type NostrKeys = {
+  __typename?: 'NostrKeys';
+  privkey: Scalars['String'];
+  pubkey: Scalars['String'];
+};
+
+export type NostrRelays = {
+  __typename?: 'NostrRelays';
+  urls: Array<Scalars['String']>;
+};
+
 export type OnChainBalance = {
   __typename?: 'OnChainBalance';
   closing: Scalars['String'];
@@ -975,7 +980,6 @@ export type Query = {
   getHello: Scalars['String'];
   getInvoiceStatusChange: Scalars['String'];
   getInvoices: GetInvoicesType;
-  getKeys: Keys;
   getLatestVersion: Scalars['String'];
   getLightningAddressInfo: PayRequest;
   getLightningAddresses: Array<LightningAddress>;
@@ -988,10 +992,11 @@ export type Query = {
   getNodeBalances: Balances;
   getNodeInfo: NodeInfo;
   getNodeSocialInfo: LightningNodeSocialInfo;
+  getNostrKeys: NostrKeys;
+  getNostrRelays: NostrRelays;
   getPayments: GetPaymentsType;
   getPeers: Array<Peer>;
   getPendingChannels: Array<PendingChannel>;
-  getRelays: Relays;
   getServerAccounts: Array<ServerAccount>;
   getTimeHealth: ChannelsTimeHealth;
   getTwofaSecret: TwofaResult;
@@ -1081,11 +1086,6 @@ export type QueryVerifyBackupsArgs = {
 export type QueryVerifyMessageArgs = {
   message: Scalars['String'];
   signature: Scalars['String'];
-};
-
-export type Relays = {
-  __typename?: 'Relays';
-  urls: Array<Scalars['String']>;
 };
 
 export type Route = {
