@@ -69,18 +69,13 @@ export class NostrService {
       const profileContent = {
         username: node.alias,
         about: 'Auntie LND',
-      };
-
-      // structure the lightning tags to tie a profile to a lightning node
-      const lightningTag = {
         ip: node.public_key,
-        s: attestation.signature,
       };
 
       // create kind 0 profile data
       const profile: EventTemplate = {
         kind: Kind.Metadata,
-        tags: [['l', JSON.stringify(lightningTag)]],
+        tags: [['s', attestation.signature]],
         content: JSON.stringify(profileContent),
         created_at: Math.floor(Date.now() / 1000),
       };
@@ -97,17 +92,17 @@ export class NostrService {
         id: nostr.getEventHash(unsignedProfileEvent),
         sig: nostr.signEvent(unsignedProfileEvent, privateKey),
       };
-      console.log('signed profile event', signedProfileEvent);
+
       // broadcast profile
       const createProfile = this.connectedRelays[0].publish(signedProfileEvent);
-      console.log('Ihavebroadcasted', createProfile);
+
       createProfile.on('ok', () => {
-        console.log(`Created account for node: ${node.public_key}`);
+        this.logger.info(`Created account for node: ${node.public_key}`);
         resolve(signedProfileEvent);
       });
 
       createProfile.on('failed', () => {
-        console.log(`FAILED :(`);
+        this.logger.error(`Failed to create account for ${node.public_key}`);
         reject('could not create profile. you fucking loser.');
       });
     });
