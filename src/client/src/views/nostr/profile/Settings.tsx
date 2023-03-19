@@ -16,10 +16,11 @@ import {
 import { X } from 'react-feather';
 import { ToolsResponsiveLine } from '../../tools/Tools.styled';
 import { Subtitle } from '../../../components/typography/Styled';
-import { getWithCopy } from '../../../components/generic/helpers';
+// import { getWithCopy } from '../../../components/generic/helpers';
 import { toast } from 'react-toastify';
 import { getErrorContent } from '../../../utils/error';
-import { useGetAccountQuery } from '../../../graphql/queries/__generated__/getAccount.generated';
+import { useKeysQuery } from '../../../graphql/queries/__generated__/getKeys.generated';
+// import { useLocalStorage } from '../../../hooks/UseLocalStorage';
 
 type ReportType =
   | 'chain-fees'
@@ -61,39 +62,33 @@ const reducer = (state: StateType, action: ActionType): StateType => {
       return state;
   }
 };
+// const defaultSettings = {
+//   followOption: 'peers',
+//   nsec: null,
+// };
 
 export const Settings = () => {
   const [showDetails, setShowDetails] = React.useState(false);
   // const { data, loading, error } = useGetNostrAccountQuery({
   //   onError: error => toast.error(getErrorContent(error)),
   // });
-  const { data, loading, error } = useGetAccountQuery({
+  // const [settings, setSettings] = useLocalStorage(
+  //   'nostrSettings',
+  //   defaultSettings
+  // );
+  const { data, loading, error } = useKeysQuery({
     onError: error => toast.error(getErrorContent(error)),
   });
-  data;
-  error;
+  console.log('hereherehre', data, error);
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
   // const [getReport, { data, loading }] = useGetAccountingReportLazyQuery();
 
-  // React.useEffect(() => {
-  // if (!loading && data && data.getAccountingReport) {
-  //   saveToPc(
-  //     data.getAccountingReport,
-  //     `accounting-${state.type}-${state.year || ''}-${state.month || ''}`,
-  //     true
-  //   );
-  // }
-  // }, [data, loading, state.type]);
-
-  // const reportButton = (report: ReportType, title: string) => (
-  //   <SingleButton
-  //     selected={state.type === report}
-  //     onClick={() => !loading && dispatch({ type: 'type', report })}
-  //   >
-  //     {title}
-  //   </SingleButton>
-  // );
+  React.useEffect(() => {
+    if (!loading && data && data.getKeys) {
+      console.log(data.getKeys);
+    }
+  }, [data, loading]);
 
   const followToggle = (option: FollowOption) => (
     <SingleButton
@@ -105,18 +100,23 @@ export const Settings = () => {
       {option ? option : 'All'}
     </SingleButton>
   );
+  // const handleDeleteSecretKey = () => {
+  //   setSettings({ nsec: '' });
+  // };
 
   const renderDetails = () => {
     return (
       <>
         <Separation />
         <ToolsResponsiveLine>
-          <Subtitle>Pubkey</Subtitle>
-          {getWithCopy('thisismypubkey')}
-        </ToolsResponsiveLine>
-        <ToolsResponsiveLine>
-          <Subtitle>Attestation</Subtitle>
-          {getWithCopy('thisismysignature')}
+          <Subtitle>Forget Secret Key</Subtitle>
+          <ColorButton
+            fullWidth={false}
+            withMargin={'0 0 0 8px'}
+            // onClick={() => handleDeleteSecretKey()}
+          >
+            Delete
+          </ColorButton>
         </ToolsResponsiveLine>
         <ToolsResponsiveLine>
           <DarkSubTitle>Automatically Follow Peers</DarkSubTitle>
@@ -131,6 +131,7 @@ export const Settings = () => {
           loading={loading}
           disabled={loading}
           onClick={() =>
+            // DO SAVE INFO
             // getReport({
             //   variables: {
             //     fiat: state.fiat,
@@ -146,7 +147,7 @@ export const Settings = () => {
           fullWidth={true}
           withMargin={'16px 0 0'}
         >
-          Generate
+          Save
         </ColorButton>
       </>
     );
@@ -164,7 +165,7 @@ export const Settings = () => {
               showDetails ? setShowDetails(false) : setShowDetails(true)
             }
           >
-            {showDetails ? <X size={18} /> : 'Details'}
+            {showDetails ? <X size={18} /> : 'Edit'}
           </ColorButton>
         </SingleLine>
         {showDetails && renderDetails()}
