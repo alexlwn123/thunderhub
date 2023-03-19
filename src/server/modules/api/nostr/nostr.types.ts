@@ -63,8 +63,11 @@ export class FollowPeers {
 
 @ObjectType()
 export class NostrProfile {
-  @Field(() => [NostrEvent])
-  profile: Array<NostrEvent>;
+  @Field(() => NostrEvent)
+  profile: NostrEvent;
+
+  @Field(() => NostrEvent)
+  attestation: NostrEvent;
 }
 
 export interface NostrNodeAttestation {

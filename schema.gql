@@ -573,7 +573,8 @@ type NostrKeys {
 }
 
 type NostrProfile {
-  profile: [NostrEvent!]!
+  attestation: NostrEvent!
+  profile: NostrEvent!
 }
 
 type NostrRelays {

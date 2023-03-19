@@ -11,7 +11,7 @@ export type NostrProfileQuery = {
   __typename?: 'Query';
   getNostrProfile: {
     __typename?: 'NostrProfile';
-    profile: Array<{
+    profile: {
       __typename?: 'NostrEvent';
       kind: number;
       tags: Array<Array<string>>;
@@ -20,7 +20,7 @@ export type NostrProfileQuery = {
       pubkey: string;
       id: string;
       sig: string;
-    }>;
+    };
   };
 };
 

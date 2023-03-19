@@ -265,6 +265,10 @@ export class NostrService {
     const profile = await this.connectedRelays[0].list([
       { kinds: [Kind.Metadata], authors: [pubkey] },
     ]);
-    return { profile: profile };
+
+    const attestation = await this.connectedRelays[0].list([
+      { kinds: [80081], authors: [pubkey] },
+    ]);
+    return { profile: profile[0], attestation: attestation[0] };
   }
 }

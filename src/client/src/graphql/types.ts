@@ -836,7 +836,8 @@ export type NostrKeys = {
 
 export type NostrProfile = {
   __typename?: 'NostrProfile';
-  profile: Array<NostrEvent>;
+  attestation: NostrEvent;
+  profile: NostrEvent;
 };
 
 export type NostrRelays = {
