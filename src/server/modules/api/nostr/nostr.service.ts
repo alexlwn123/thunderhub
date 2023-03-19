@@ -120,6 +120,9 @@ export class NostrService {
     });
   }
 
+  /*
+  NEED TO CHECK IF IP IS ALREADY IN
+  */
   private async createNodeAnnouncement(
     privateKey,
     attestation,
@@ -165,5 +168,96 @@ export class NostrService {
         resolve(null);
       });
     });
+  }
+
+  async getValidatedNotes(id: string) {
+    const account = this.accountService.getAccount(id);
+    if (!account) throw new Error('Node account not found.');
+
+    const validatedNodes = {};
+    const notes = await this.connectedRelays[0].list([{ kinds: [80081] }]);
+    for (const note of notes) {
+      const attestation = <NostrNodeAttestation>JSON.parse(note.content);
+      const valid = await this.lndService.verifyMessage(
+        account,
+        attestation.ip,
+        attestation.s
+      );
+      const seen = validatedNodes[attestation.ip];
+      if (!seen) {
+        if (valid.signed_by === attestation.ip)
+          validatedNodes[attestation.ip] = note.pubkey;
+      }
+    }
+    return { nodes: validatedNodes };
+  }
+
+  async addPeersToFollowList(privateKey: string, id: string) {
+    const account = this.accountService.getAccount(id);
+    if (!account) throw new Error('Node account not found.');
+    const pubkeysToFollow = [];
+    const peers = await this.lndService.getPeers(account);
+    const validNodes = await this.getValidatedNotes(id);
+    const nodes = Object.entries(validNodes.nodes);
+    peers.peers.forEach(peer => {
+      const match = nodes.find(x => x[0] === peer.public_key) ?? [];
+      if (match.length > 0) {
+        // Add this guy as a new contact
+        console.log('valid node', match);
+        pubkeysToFollow.push(match[1]);
+      }
+    });
+
+    const follows = await this.followNostrAccounts(pubkeysToFollow, privateKey);
+
+    return { peers: follows };
+  }
+
+  private async followNostrAccounts(
+    pubkeyToFollow: string[],
+    privateKey: string
+  ) {
+    return new Promise(resolve => {
+      const publicKeys = [];
+      pubkeyToFollow.forEach(pubkey => {
+        publicKeys.push(['p', pubkey]);
+      });
+      const followContent: EventTemplate = {
+        kind: Kind.Contacts,
+        created_at: Math.floor(Date.now() / 1000),
+        content: '',
+        tags: publicKeys,
+      };
+
+      const unsignedFollow: UnsignedEvent = {
+        ...followContent,
+        pubkey: nostr.getPublicKey(privateKey),
+      };
+
+      const signedFollow: Event = {
+        ...unsignedFollow,
+        id: nostr.getEventHash(unsignedFollow),
+        sig: nostr.signEvent(unsignedFollow, privateKey),
+      };
+
+      const follow = this.connectedRelays[0].publish(signedFollow);
+
+      follow.on('ok', () => {
+        this.logger.info(`Published following: ${pubkeyToFollow}`);
+        resolve(signedFollow);
+      });
+
+      follow.on('failed', () => {
+        this.logger.error(`Could not follow: ${pubkeyToFollow}`);
+        resolve('Did not work.');
+      });
+    });
+  }
+
+  async getFollowingList(myPubkey: string) {
+    const list = await this.connectedRelays[0].list([
+      { kinds: [Kind.Contacts], authors: [myPubkey] },
+    ]);
+    return { following: list };
   }
 }

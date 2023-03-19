@@ -355,6 +355,16 @@ export type FeeHealth = {
   score?: Maybe<Scalars['Float']>;
 };
 
+export type FollowList = {
+  __typename?: 'FollowList';
+  following: Array<NostrEvent>;
+};
+
+export type FollowPeers = {
+  __typename?: 'FollowPeers';
+  peers: NostrEvent;
+};
+
 export type Forward = {
   __typename?: 'Forward';
   created_at: Scalars['String'];
@@ -496,6 +506,7 @@ export type Mutation = {
   createMacaroon: CreateMacaroon;
   createThunderPoints: Scalars['Boolean'];
   fetchLnUrl: LnUrlRequest;
+  followPeers?: Maybe<FollowPeers>;
   generateNostrProfile: NostrGenerateProfile;
   getAuthToken: Scalars['Boolean'];
   getSessionToken: Scalars['String'];
@@ -591,6 +602,10 @@ export type MutationCreateThunderPointsArgs = {
 
 export type MutationFetchLnUrlArgs = {
   url: Scalars['String'];
+};
+
+export type MutationFollowPeersArgs = {
+  privateKey: Scalars['String'];
 };
 
 export type MutationGenerateNostrProfileArgs = {
@@ -982,6 +997,7 @@ export type Query = {
   getClosedChannels: Array<ClosedChannel>;
   getConfigState: ConfigState;
   getFeeHealth: ChannelsFeeHealth;
+  getFollowList: FollowList;
   getForwards: Array<Forward>;
   getHello: Scalars['String'];
   getInvoiceStatusChange: Scalars['String'];
@@ -1038,6 +1054,10 @@ export type QueryGetChannelArgs = {
 
 export type QueryGetChannelsArgs = {
   active?: InputMaybe<Scalars['Boolean']>;
+};
+
+export type QueryGetFollowListArgs = {
+  myPubkey: Scalars['String'];
 };
 
 export type QueryGetForwardsArgs = {

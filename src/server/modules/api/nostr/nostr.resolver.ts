@@ -2,7 +2,13 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from '../../security/security.decorators';
 import { UserId } from '../../security/security.types';
 import { NostrService } from './nostr.service';
-import { NostrGenerateProfile, NostrKeys, NostrRelays } from './nostr.types';
+import {
+  FollowList,
+  FollowPeers,
+  NostrGenerateProfile,
+  NostrKeys,
+  NostrRelays,
+} from './nostr.types';
 
 @Resolver(() => NostrKeys)
 export class KeysResolver {
@@ -37,7 +43,33 @@ export class EventResolver {
     @Args('privateKey') privateKey: string
   ) {
     const profile = await this.nostrService.generateProfile(privateKey, id);
-    console.log('dwefwergwergw', profile);
     return profile;
+  }
+}
+
+@Resolver(() => FollowPeers)
+export class FollowResolver {
+  constructor(private nostrService: NostrService) {}
+
+  @Mutation(() => FollowPeers, { nullable: true })
+  async followPeers(
+    @CurrentUser() { id }: UserId,
+    @Args('privateKey') privateKey: string
+  ) {
+    const peers = await this.nostrService.addPeersToFollowList(privateKey, id);
+    console.log('PEERs', peers);
+    return peers;
+  }
+}
+
+@Resolver(() => FollowList)
+export class FollowListResolver {
+  constructor(private nostrService: NostrService) {}
+
+  @Query(() => FollowList)
+  async getFollowList(@Args('myPubkey') myPubkey: string) {
+    const list = await this.nostrService.getFollowingList(myPubkey);
+    console.log('list', list);
+    return list;
   }
 }

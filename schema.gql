@@ -305,6 +305,14 @@ type FeeHealth {
   score: Float
 }
 
+type FollowList {
+  following: [NostrEvent!]!
+}
+
+type FollowPeers {
+  peers: NostrEvent!
+}
+
 type Forward {
   created_at: String!
   fee: Float!
@@ -432,6 +440,7 @@ type Mutation {
   createMacaroon(permissions: NetworkInfoInput!): CreateMacaroon!
   createThunderPoints(alias: String!, id: String!, public_key: String!, uris: [String!]!): Boolean!
   fetchLnUrl(url: String!): LnUrlRequest!
+  followPeers(privateKey: String!): FollowPeers
   generateNostrProfile(privateKey: String!): NostrGenerateProfile!
   getAuthToken(cookie: String): Boolean!
   getSessionToken(id: String!, password: String!, token: String): String!
@@ -713,6 +722,7 @@ type Query {
   getClosedChannels: [ClosedChannel!]!
   getConfigState: ConfigState!
   getFeeHealth: ChannelsFeeHealth!
+  getFollowList(myPubkey: String!): FollowList!
   getForwards(days: Float!): [Forward!]!
   getHello: String!
   getInvoiceStatusChange(id: String!): String!
