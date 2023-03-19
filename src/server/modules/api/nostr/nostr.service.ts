@@ -258,7 +258,13 @@ export class NostrService {
     const list = await this.connectedRelays[0].list([
       { kinds: [Kind.Contacts], authors: [myPubkey] },
     ]);
-    return { following: list };
+    const listOfPubkeys = [];
+    const tags = list[0].tags;
+    for (const tag of tags) {
+      listOfPubkeys.push(tag[1]);
+    }
+    // console.log("pubs", listOfPubkeys)
+    return { following: listOfPubkeys };
   }
 
   async getNostrProfile(pubkey: string) {
@@ -271,4 +277,8 @@ export class NostrService {
     ]);
     return { profile: profile[0], attestation: attestation[0] };
   }
+  // async getNostrFeed(myPubkey:string) {
+  // const followList = await this.getFollowingList(myPubkey)
+  // const match = followList.following.find(x => x[0] === peer.public_key) ?? [];
+  // }
 }

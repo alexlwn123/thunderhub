@@ -306,7 +306,7 @@ type FeeHealth {
 }
 
 type FollowList {
-  following: [NostrEvent!]!
+  following: [String!]!
 }
 
 type FollowPeers {
