@@ -57,6 +57,7 @@ export class FollowResolver {
     @CurrentUser() { id }: UserId,
     @Args('privateKey') privateKey: string
   ) {
+    console.log('fef');
     const peers = await this.nostrService.addPeersToFollowList(privateKey, id);
     return peers;
   }
