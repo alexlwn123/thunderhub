@@ -277,8 +277,12 @@ export class NostrService {
     ]);
     return { profile: profile[0], attestation: attestation[0] };
   }
-  // async getNostrFeed(myPubkey:string) {
-  // const followList = await this.getFollowingList(myPubkey)
-  // const match = followList.following.find(x => x[0] === peer.public_key) ?? [];
-  // }
+
+  async getNostrFeed(myPubkey: string) {
+    const followList = await this.getFollowingList(myPubkey);
+    const feed = await this.connectedRelays[0].list([
+      { kinds: [Kind.Text], authors: followList.following },
+    ]);
+    return { feed: feed };
+  }
 }

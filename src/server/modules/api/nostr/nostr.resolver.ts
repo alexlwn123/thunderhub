@@ -5,6 +5,7 @@ import { NostrService } from './nostr.service';
 import {
   FollowList,
   FollowPeers,
+  NostrFeed,
   NostrGenerateProfile,
   NostrKeys,
   NostrProfile,
@@ -83,5 +84,17 @@ export class NostrProfileResolver {
   async getNostrProfile(@Args('pubkey') pubkey: string) {
     const profile = await this.nostrService.getNostrProfile(pubkey);
     return profile;
+  }
+}
+
+@Resolver(() => NostrFeed)
+export class NostrFeedResolver {
+  constructor(private nostrService: NostrService) {}
+
+  @Query(() => NostrFeed, { name: 'getNostrFeed' })
+  async getNostrFeed(@Args('myPubkey') myPubkey: string) {
+    const feed = await this.nostrService.getNostrFeed(myPubkey);
+    console.log('FEEd', feed);
+    return feed;
   }
 }

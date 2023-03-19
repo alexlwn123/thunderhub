@@ -822,6 +822,11 @@ export type NostrEvent = {
   tags: Array<Array<Scalars['String']>>;
 };
 
+export type NostrFeed = {
+  __typename?: 'NostrFeed';
+  feed: Array<NostrEvent>;
+};
+
 export type NostrGenerateProfile = {
   __typename?: 'NostrGenerateProfile';
   announcement: NostrEvent;
@@ -1020,6 +1025,7 @@ export type Query = {
   getNodeBalances: Balances;
   getNodeInfo: NodeInfo;
   getNodeSocialInfo: LightningNodeSocialInfo;
+  getNostrFeed: NostrFeed;
   getNostrKeys: NostrKeys;
   getNostrProfile: NostrProfile;
   getNostrRelays: NostrRelays;
@@ -1094,6 +1100,10 @@ export type QueryGetNodeArgs = {
 
 export type QueryGetNodeSocialInfoArgs = {
   pubkey: Scalars['String'];
+};
+
+export type QueryGetNostrFeedArgs = {
+  myPubkey: Scalars['String'];
 };
 
 export type QueryGetNostrProfileArgs = {

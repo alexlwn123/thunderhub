@@ -562,6 +562,10 @@ type NostrEvent {
   tags: [[String!]!]!
 }
 
+type NostrFeed {
+  feed: [NostrEvent!]!
+}
+
 type NostrGenerateProfile {
   announcement: NostrEvent!
   profile: NostrEvent!
@@ -744,6 +748,7 @@ type Query {
   getNodeBalances: Balances!
   getNodeInfo: NodeInfo!
   getNodeSocialInfo(pubkey: String!): LightningNodeSocialInfo!
+  getNostrFeed(myPubkey: String!): NostrFeed!
   getNostrKeys: NostrKeys!
   getNostrProfile(pubkey: String!): NostrProfile!
   getNostrRelays: NostrRelays!

@@ -70,6 +70,12 @@ export class NostrProfile {
   attestation: NostrEvent;
 }
 
+@ObjectType()
+export class NostrFeed {
+  @Field(() => [NostrEvent])
+  feed: NostrEvent[];
+}
+
 export interface NostrNodeAttestation {
   ip: string;
   s: string;
