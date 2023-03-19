@@ -58,7 +58,6 @@ export class FollowResolver {
     @Args('privateKey') privateKey: string
   ) {
     const peers = await this.nostrService.addPeersToFollowList(privateKey, id);
-    console.log('PEERs', peers);
     return peers;
   }
 }
