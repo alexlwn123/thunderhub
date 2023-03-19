@@ -285,4 +285,36 @@ export class NostrService {
     ]);
     return { feed: feed };
   }
+
+  async postNostrNote(privateKey: string, note: string) {
+    return new Promise(resolve => {
+      const noteObj: EventTemplate = {
+        kind: Kind.Text,
+        content: note,
+        tags: [],
+        created_at: Math.floor(Date.now() / 1000),
+      };
+
+      const unsignedNote: UnsignedEvent = {
+        ...noteObj,
+        pubkey: nostr.getPublicKey(privateKey),
+      };
+
+      const signedNote: Event = {
+        ...unsignedNote,
+        id: nostr.getEventHash(unsignedNote),
+        sig: nostr.signEvent(unsignedNote, privateKey),
+      };
+
+      const post = this.connectedRelays[0].publish(signedNote);
+      post.on('ok', () => {
+        this.logger.info(`Posted note: ${signedNote.id}`);
+        resolve(signedNote);
+      });
+      post.on('failed', () => {
+        this.logger.error(`Failed to post note: ${signedNote.id}`);
+        resolve('Failed to post note.');
+      });
+    });
+  }
 }

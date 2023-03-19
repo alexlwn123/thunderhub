@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GENERATE_NOSTR_PROFILE = gql`
-  mutation NostrEvent($privateKey: String!) {
+  mutation GenerateNostrProfile($privateKey: String!) {
     generateNostrProfile(privateKey: $privateKey) {
       profile {
         kind

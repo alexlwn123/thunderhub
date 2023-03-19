@@ -5,6 +5,7 @@ import { NostrService } from './nostr.service';
 import {
   FollowList,
   FollowPeers,
+  NostrEvent,
   NostrFeed,
   NostrGenerateProfile,
   NostrKeys,
@@ -96,5 +97,20 @@ export class NostrFeedResolver {
     const feed = await this.nostrService.getNostrFeed(myPubkey);
     console.log('FEEd', feed);
     return feed;
+  }
+}
+
+@Resolver(() => NostrEvent)
+export class NostrEventResolver {
+  constructor(private nostrService: NostrService) {}
+
+  @Mutation(() => NostrEvent, { name: 'postNostrNote' })
+  async postNostrNote(
+    @Args('privateKey') privateKey: string,
+    @Args('note') note: string
+  ) {
+    const post = await this.nostrService.postNostrNote(privateKey, note);
+    console.log('Post', post);
+    return post;
   }
 }

@@ -9,6 +9,7 @@ import {
   FollowListResolver,
   NostrProfileResolver,
   NostrFeedResolver,
+  NostrEventResolver,
 } from './nostr.resolver';
 import { NostrService } from './nostr.service';
 
@@ -23,6 +24,7 @@ import { NostrService } from './nostr.service';
     FollowListResolver,
     NostrProfileResolver,
     NostrFeedResolver,
+    NostrEventResolver,
   ],
 })
 export class NostrModule {}

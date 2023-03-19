@@ -3,11 +3,11 @@ import * as Types from '../../types';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type NostrEventMutationVariables = Types.Exact<{
+export type GenerateNostrProfileMutationVariables = Types.Exact<{
   privateKey: Types.Scalars['String'];
 }>;
 
-export type NostrEventMutation = {
+export type GenerateNostrProfileMutation = {
   __typename?: 'Mutation';
   generateNostrProfile: {
     __typename?: 'NostrGenerateProfile';
@@ -34,8 +34,8 @@ export type NostrEventMutation = {
   };
 };
 
-export const NostrEventDocument = gql`
-  mutation NostrEvent($privateKey: String!) {
+export const GenerateNostrProfileDocument = gql`
+  mutation GenerateNostrProfile($privateKey: String!) {
     generateNostrProfile(privateKey: $privateKey) {
       profile {
         kind
@@ -58,46 +58,46 @@ export const NostrEventDocument = gql`
     }
   }
 `;
-export type NostrEventMutationFn = Apollo.MutationFunction<
-  NostrEventMutation,
-  NostrEventMutationVariables
+export type GenerateNostrProfileMutationFn = Apollo.MutationFunction<
+  GenerateNostrProfileMutation,
+  GenerateNostrProfileMutationVariables
 >;
 
 /**
- * __useNostrEventMutation__
+ * __useGenerateNostrProfileMutation__
  *
- * To run a mutation, you first call `useNostrEventMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useNostrEventMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useGenerateNostrProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateNostrProfileMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [nostrEventMutation, { data, loading, error }] = useNostrEventMutation({
+ * const [generateNostrProfileMutation, { data, loading, error }] = useGenerateNostrProfileMutation({
  *   variables: {
  *      privateKey: // value for 'privateKey'
  *   },
  * });
  */
-export function useNostrEventMutation(
+export function useGenerateNostrProfileMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    NostrEventMutation,
-    NostrEventMutationVariables
+    GenerateNostrProfileMutation,
+    GenerateNostrProfileMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<NostrEventMutation, NostrEventMutationVariables>(
-    NostrEventDocument,
-    options
-  );
+  return Apollo.useMutation<
+    GenerateNostrProfileMutation,
+    GenerateNostrProfileMutationVariables
+  >(GenerateNostrProfileDocument, options);
 }
-export type NostrEventMutationHookResult = ReturnType<
-  typeof useNostrEventMutation
+export type GenerateNostrProfileMutationHookResult = ReturnType<
+  typeof useGenerateNostrProfileMutation
 >;
-export type NostrEventMutationResult =
-  Apollo.MutationResult<NostrEventMutation>;
-export type NostrEventMutationOptions = Apollo.BaseMutationOptions<
-  NostrEventMutation,
-  NostrEventMutationVariables
+export type GenerateNostrProfileMutationResult =
+  Apollo.MutationResult<GenerateNostrProfileMutation>;
+export type GenerateNostrProfileMutationOptions = Apollo.BaseMutationOptions<
+  GenerateNostrProfileMutation,
+  GenerateNostrProfileMutationVariables
 >;

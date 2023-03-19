@@ -523,6 +523,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   openChannel: OpenOrCloseChannel;
   pay: Scalars['Boolean'];
+  postNostrNote: NostrEvent;
   pushBackup: Scalars['Boolean'];
   removePeer: Scalars['Boolean'];
   removeTwofaSecret: Scalars['Boolean'];
@@ -671,6 +672,11 @@ export type MutationPayArgs = {
   max_paths: Scalars['Float'];
   out?: InputMaybe<Array<Scalars['String']>>;
   request: Scalars['String'];
+};
+
+export type MutationPostNostrNoteArgs = {
+  note: Scalars['String'];
+  privateKey: Scalars['String'];
 };
 
 export type MutationRemovePeerArgs = {
