@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Radio, X } from 'react-feather';
 import styled from 'styled-components';
@@ -24,7 +24,9 @@ import {
 } from '../../../components/generic/Styled';
 import { mediaWidths, themeColors } from '../../../styles/Themes';
 import { useLocalStorage } from '../../../hooks/UseLocalStorage';
-import { getPublicKey, generatePrivateKey, nip19 } from 'nostr-tools';
+import { useNostrDispatch, useNostrState } from '../../../context/NostrContext';
+import { useNostrKeysLazyQuery } from '../../../graphql/queries/__generated__/getNostrKeys.generated';
+import { useNostrProfileLazyQuery } from '../../../graphql/queries/__generated__/getNostrProfile.generated';
 
 const Key = styled.div`
   overflow: hidden;
@@ -68,41 +70,61 @@ const ButtonRow = styled.div`
   }
 `;
 
-const defaultSettings = {
-  nsec: '',
-  followOption: 'disabled',
-};
-
 export const Profile = () => {
+  const { initialized, nsec, npub, pub, sec } = useNostrState();
+  const dispatch = useNostrDispatch();
+  const [nostrCache, setNostrCache] = useLocalStorage('nostr', {});
   const [open, openSet] = useState<boolean>(false);
-  const [nsec, setNsec] = useState<string>('');
-  const [sec, setSec] = useState<string>('');
-  sec;
-  const [npub, setNpub] = useState<string>('');
-  const [pub, setPub] = useState<string>('');
-  // const [nsecIsSet, setNsecIsSet] = useState<boolean>(false);
-  // const [accountExists, setAccountExists] = useState<boolean>(false);
+  const [input, setInput] = useState<string>('');
+
   const [willSend, setWillSend] = React.useState(false);
-  setWillSend(false);
+  // setWillSend(false);
 
   const { loading, data } = useGetNodeInfoQuery({
     ssr: false,
     onError: error => toast.error(getErrorContent(error)),
   });
-  const [settings, setSettings] = useLocalStorage(
-    'nostrSettings',
-    defaultSettings
-  );
-  // const { loading, data } = useGetNostrProfile({
-  //   ssr: false,
-  //   onError: error => toast.error(getErrorContent(error)),
-  // });
-  React.useEffect(() => {
-    if (!settings || !settings?.nsec) return;
-    setNsec(settings?.nsec ?? '');
-    handleSetNsec(nsec);
-    console.log('SETINGS', settings);
-  }, [settings, open, settings.nsec, nsec]);
+  // useGenerateNostrProfile --> from pubkey, get rest
+  //useGetkeys ==> give sec key, then gen pubkey
+  const [getKeys, { data: keysData, loading: keysLoading }] =
+    useNostrKeysLazyQuery({
+      onError: error => toast.error(getErrorContent(error)),
+    });
+
+  const [getProfile] = useNostrProfileLazyQuery({
+    onError: error => toast.error(getErrorContent(error)),
+  });
+  useEffect(() => {
+    //deelete me later
+    console.log(nostrCache, setWillSend);
+  }, [nostrCache, setWillSend]);
+  useEffect(() => {
+    console.log(nsec, npub, 'sec', sec, 'pub', pub);
+    if (!nsec) return;
+    if (!npub) {
+      getProfile();
+      console.log('loadeding');
+      dispatch({ type: 'loaded', nsec });
+      return;
+    }
+    // setNostrCache({ nsec });
+  }, [nsec, npub, pub, sec, dispatch, setNostrCache, getProfile]);
+
+  useEffect(() => {
+    if (!initialized || keysLoading || !keysData) return;
+    console.log('keysData', keysData);
+    dispatch({
+      type: 'created',
+      sec: keysData.getNostrKeys.privkey,
+      pub: keysData.getNostrKeys.pubkey,
+    });
+  }, [initialized, keysLoading, keysData, dispatch]);
+
+  useEffect(() => {
+    if (!initialized) {
+      dispatch({ type: 'initialized' });
+    }
+  }, [initialized, dispatch]);
 
   if (!data || loading) {
     return <LoadingCard title={'Nostr'} />;
@@ -110,53 +132,22 @@ export const Profile = () => {
 
   const { public_key } = data.getNodeInfo || {};
 
-  const handleSetNsec = (nsec: string) => {
-    try {
-      const sec = nip19.decode(nsec).data as string;
-      const pub = getPublicKey(sec);
-      const npub = nip19.npubEncode(pub);
-      setSec(sec);
-      setPub(pub);
-      setNpub(npub);
-    } catch (e) {
-      console.error(e);
-      toast.error('Handle set - Nsec is invalid');
-      return;
-    }
-  };
-  const handleGenerateNsec = () => {
-    try {
-      const sec = generatePrivateKey();
-      const nsec = nip19.nsecEncode(sec);
-      const pub = getPublicKey(sec);
-      const npub = nip19.npubEncode(pub);
-      setSec(sec);
-      setPub(pub);
-      setNpub(npub);
-      setSettings({ ...settings, nsec });
-    } catch (e) {
-      console.error(e);
-      toast.error('Handle gen - Nsec is invalid');
-      return;
-    }
-  };
-
-  if (settings.nsec == '') {
+  if (nsec === '') {
     return (
       <CardWithTitle>
         <CardTitle>Load Nostr Profile</CardTitle>
         <SingleLine>
           <Input
-            value={nsec}
+            value={input}
             placeholder={'nsec'}
-            onChange={e => setNsec(e.target?.value ?? '')}
+            onChange={e => setInput(e.target?.value ?? '')}
           />
 
           <ColorButton
             withMargin={'0 0 0 8px'}
-            onClick={() => handleGenerateNsec()}
+            onClick={() => getProfile()}
             arrow={willSend ? false : true}
-            disabled={nsec === ''}
+            disabled={input === ''}
           >
             {willSend ? <X size={18} /> : 'Set'}
           </ColorButton>
@@ -164,7 +155,7 @@ export const Profile = () => {
         <SingleLine>
           <ColorButton
             withMargin={'0 0 0 8px'}
-            onClick={() => handleGenerateNsec()}
+            onClick={() => getKeys()}
             arrow={willSend ? false : true}
           >
             Generate new key pair.

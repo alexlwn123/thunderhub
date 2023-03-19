@@ -17,9 +17,9 @@ import { X } from 'react-feather';
 import { ToolsResponsiveLine } from '../../tools/Tools.styled';
 import { Subtitle } from '../../../components/typography/Styled';
 // import { getWithCopy } from '../../../components/generic/helpers';
-import { toast } from 'react-toastify';
-import { getErrorContent } from '../../../utils/error';
-import { useKeysQuery } from '../../../graphql/queries/__generated__/getKeys.generated';
+// import { toast } from 'react-toastify';
+// import { getErrorContent } from '../../../utils/error';
+// import { useKeysQuery } from '../../../graphql/queries/__generated__/getKeys.generated';
 // import { useLocalStorage } from '../../../hooks/UseLocalStorage';
 
 type ReportType =
@@ -76,19 +76,19 @@ export const Settings = () => {
   //   'nostrSettings',
   //   defaultSettings
   // );
-  const { data, loading, error } = useKeysQuery({
-    onError: error => toast.error(getErrorContent(error)),
-  });
-  console.log('hereherehre', data, error);
+  // const { data, loading } = useKeysQuery({
+  //   onError: error => toast.error(getErrorContent(error)),
+  // });
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const loading = false;
 
   // const [getReport, { data, loading }] = useGetAccountingReportLazyQuery();
 
-  React.useEffect(() => {
-    if (!loading && data && data.getKeys) {
-      console.log(data.getKeys);
-    }
-  }, [data, loading]);
+  // React.useEffect(() => {
+  //   if (!loading && data && data.getKeys) {
+  //     console.log(data.getKeys);
+  //   }
+  // }, [data, loading]);
 
   const followToggle = (option: FollowOption) => (
     <SingleButton
@@ -100,9 +100,6 @@ export const Settings = () => {
       {option ? option : 'All'}
     </SingleButton>
   );
-  // const handleDeleteSecretKey = () => {
-  //   setSettings({ nsec: '' });
-  // };
 
   const renderDetails = () => {
     return (
