@@ -7,6 +7,7 @@ import {
   FollowPeers,
   NostrGenerateProfile,
   NostrKeys,
+  NostrProfile,
   NostrRelays,
 } from './nostr.types';
 
@@ -71,5 +72,16 @@ export class FollowListResolver {
     const list = await this.nostrService.getFollowingList(myPubkey);
     console.log('list', list);
     return list;
+  }
+}
+
+@Resolver(() => NostrProfile)
+export class NostrProfileResolver {
+  constructor(private nostrService: NostrService) {}
+
+  @Query(() => NostrProfile)
+  async getNostrProfile(@Args('pubkey') pubkey: string) {
+    const profile = await this.nostrService.getNostrProfile(pubkey);
+    return profile;
   }
 }

@@ -7,6 +7,7 @@ import {
   FollowResolver,
   RelaysResolver,
   FollowListResolver,
+  NostrProfileResolver,
 } from './nostr.resolver';
 import { NostrService } from './nostr.service';
 
@@ -19,6 +20,7 @@ import { NostrService } from './nostr.service';
     EventResolver,
     FollowResolver,
     FollowListResolver,
+    NostrProfileResolver,
   ],
 })
 export class NostrModule {}

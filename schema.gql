@@ -572,6 +572,10 @@ type NostrKeys {
   pubkey: String!
 }
 
+type NostrProfile {
+  profile: [NostrEvent!]!
+}
+
 type NostrRelays {
   urls: [String!]!
 }
@@ -740,6 +744,7 @@ type Query {
   getNodeInfo: NodeInfo!
   getNodeSocialInfo(pubkey: String!): LightningNodeSocialInfo!
   getNostrKeys: NostrKeys!
+  getNostrProfile(pubkey: String!): NostrProfile!
   getNostrRelays: NostrRelays!
   getPayments(token: String): GetPaymentsType!
   getPeers: [Peer!]!

@@ -260,4 +260,11 @@ export class NostrService {
     ]);
     return { following: list };
   }
+
+  async getNostrProfile(pubkey: string) {
+    const profile = await this.connectedRelays[0].list([
+      { kinds: [Kind.Metadata], authors: [pubkey] },
+    ]);
+    return { profile: profile };
+  }
 }
