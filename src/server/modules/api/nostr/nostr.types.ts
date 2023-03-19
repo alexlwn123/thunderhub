@@ -49,16 +49,17 @@ export class NostrGenerateProfile {
   announcement: NostrEvent;
 }
 
-// declare interface NostrFilter {
-//   ids?: string[]
-//   kinds?: Kind[]
-//   authors?: string[]
-//   since?: number
-//   until?: number
-//   "#e"?: string[]
-//   "#p"?: string[]
-//   limit?: number
-// }
+@ObjectType()
+export class FollowList {
+  @Field(() => [NostrEvent])
+  following: Array<NostrEvent>;
+}
+
+@ObjectType()
+export class FollowPeers {
+  @Field(() => NostrEvent)
+  peers: NostrEvent;
+}
 
 export interface NostrNodeAttestation {
   ip: string;
