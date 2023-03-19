@@ -357,7 +357,7 @@ export type FeeHealth = {
 
 export type FollowList = {
   __typename?: 'FollowList';
-  following: Array<NostrEvent>;
+  following: Array<Scalars['String']>;
 };
 
 export type FollowPeers = {

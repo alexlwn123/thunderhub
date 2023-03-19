@@ -9,33 +9,13 @@ export type FollowListQueryVariables = Types.Exact<{
 
 export type FollowListQuery = {
   __typename?: 'Query';
-  getFollowList: {
-    __typename?: 'FollowList';
-    following: Array<{
-      __typename?: 'NostrEvent';
-      kind: number;
-      tags: Array<Array<string>>;
-      content: string;
-      created_at: number;
-      pubkey: string;
-      id: string;
-      sig: string;
-    }>;
-  };
+  getFollowList: { __typename?: 'FollowList'; following: Array<string> };
 };
 
 export const FollowListDocument = gql`
   query FollowList($myPubkey: String!) {
     getFollowList(myPubkey: $myPubkey) {
-      following {
-        kind
-        tags
-        content
-        created_at
-        pubkey
-        id
-        sig
-      }
+      following
     }
   }
 `;

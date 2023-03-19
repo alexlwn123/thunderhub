@@ -51,8 +51,8 @@ export class NostrGenerateProfile {
 
 @ObjectType()
 export class FollowList {
-  @Field(() => [NostrEvent])
-  following: Array<NostrEvent>;
+  @Field(() => [String])
+  following: Array<string>;
 }
 
 @ObjectType()
