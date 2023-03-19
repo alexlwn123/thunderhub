@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { Radio, Copy, X } from 'react-feather';
+import { Radio, X } from 'react-feather';
 import styled from 'styled-components';
-import CopyToClipboard from 'react-copy-to-clipboard';
+// import CopyToClipboard from 'react-copy-to-clipboard';
 import { ColorButton } from '../../../components/buttons/colorButton/ColorButton';
-import { renderLine } from '../../../components/generic/helpers';
+import {
+  // getWithCopy,
+  getWithCopyFull,
+  renderLine,
+} from '../../../components/generic/helpers';
 import { useGetNodeInfoQuery } from '../../../graphql/queries/__generated__/getNodeInfo.generated';
 import { getErrorContent } from '../../../utils/error';
 import { LoadingCard } from '../../../components/loading/LoadingCard';
+import { Input } from '../../../components/input';
 import {
   CardWithTitle,
   CardTitle,
@@ -18,6 +23,8 @@ import {
   Separation,
 } from '../../../components/generic/Styled';
 import { mediaWidths, themeColors } from '../../../styles/Themes';
+import { useLocalStorage } from '../../../hooks/UseLocalStorage';
+import { getPublicKey, generatePrivateKey, nip19 } from 'nostr-tools';
 
 const Key = styled.div`
   overflow: hidden;
@@ -49,9 +56,9 @@ const Tile = styled.div`
   }
 `;
 
-const TextPadding = styled.span`
-  margin-left: 5px;
-`;
+// const TextPadding = styled.span`
+//   margin-left: 5px;
+// `;
 
 const ButtonRow = styled.div`
   display: flex;
@@ -61,27 +68,111 @@ const ButtonRow = styled.div`
   }
 `;
 
+const defaultSettings = {
+  nsec: '',
+  followOption: 'disabled',
+};
+
 export const Profile = () => {
   const [open, openSet] = useState<boolean>(false);
+  const [nsec, setNsec] = useState<string>('');
+  const [sec, setSec] = useState<string>('');
+  sec;
+  const [npub, setNpub] = useState<string>('');
+  const [pub, setPub] = useState<string>('');
+  // const [nsecIsSet, setNsecIsSet] = useState<boolean>(false);
+  // const [accountExists, setAccountExists] = useState<boolean>(false);
+  const [willSend, setWillSend] = React.useState(false);
+  setWillSend(false);
 
   const { loading, data } = useGetNodeInfoQuery({
     ssr: false,
     onError: error => toast.error(getErrorContent(error)),
   });
+  const [settings, setSettings] = useLocalStorage(
+    'nostrSettings',
+    defaultSettings
+  );
   // const { loading, data } = useGetNostrProfile({
   //   ssr: false,
   //   onError: error => toast.error(getErrorContent(error)),
   // });
+  React.useEffect(() => {
+    if (!settings || !settings?.nsec) return;
+    setNsec(settings?.nsec ?? '');
+    handleSetNsec(nsec);
+    console.log('SETINGS', settings);
+  }, [settings, open, settings.nsec, nsec]);
 
   if (!data || loading) {
-    return <LoadingCard title={'Connect'} />;
+    return <LoadingCard title={'Nostr'} />;
   }
 
-  const { public_key, uris } = data.getNodeInfo || {};
+  const { public_key } = data.getNodeInfo || {};
 
-  const onionAddress = uris.find((uri: string) => uri.indexOf('onion') >= 0);
-  const normalAddress = uris.find((uri: string) => uri.indexOf('onion') < 0);
+  const handleSetNsec = (nsec: string) => {
+    try {
+      const sec = nip19.decode(nsec).data as string;
+      const pub = getPublicKey(sec);
+      const npub = nip19.npubEncode(pub);
+      setSec(sec);
+      setPub(pub);
+      setNpub(npub);
+    } catch (e) {
+      console.error(e);
+      toast.error('Handle set - Nsec is invalid');
+      return;
+    }
+  };
+  const handleGenerateNsec = () => {
+    try {
+      const sec = generatePrivateKey();
+      const nsec = nip19.nsecEncode(sec);
+      const pub = getPublicKey(sec);
+      const npub = nip19.npubEncode(pub);
+      setSec(sec);
+      setPub(pub);
+      setNpub(npub);
+      setSettings({ ...settings, nsec });
+    } catch (e) {
+      console.error(e);
+      toast.error('Handle gen - Nsec is invalid');
+      return;
+    }
+  };
 
+  if (settings.nsec == '') {
+    return (
+      <CardWithTitle>
+        <CardTitle>Load Nostr Profile</CardTitle>
+        <SingleLine>
+          <Input
+            value={nsec}
+            placeholder={'nsec'}
+            onChange={e => setNsec(e.target?.value ?? '')}
+          />
+
+          <ColorButton
+            withMargin={'0 0 0 8px'}
+            onClick={() => handleGenerateNsec()}
+            arrow={willSend ? false : true}
+            disabled={nsec === ''}
+          >
+            {willSend ? <X size={18} /> : 'Set'}
+          </ColorButton>
+        </SingleLine>
+        <SingleLine>
+          <ColorButton
+            withMargin={'0 0 0 8px'}
+            onClick={() => handleGenerateNsec()}
+            arrow={willSend ? false : true}
+          >
+            Generate new key pair.
+          </ColorButton>
+        </SingleLine>
+      </CardWithTitle>
+    );
+  }
   return (
     <CardWithTitle>
       <CardTitle>
@@ -92,30 +183,9 @@ export const Profile = () => {
           <Radio size={18} color={themeColors.blue2} />
           <Tile startTile={true}>
             <DarkSubTitle>npub</DarkSubTitle>
-            <Key>{public_key}</Key>
+            <Key>{npub}</Key>
           </Tile>
           <ButtonRow>
-            {onionAddress ? (
-              <CopyToClipboard
-                text={onionAddress}
-                onCopy={() => toast.success('Onion Address Copied')}
-              >
-                <ColorButton fullWidth={true} withMargin={'0 4px 0 0'}>
-                  <Copy size={18} />
-                  <TextPadding>Onion</TextPadding>
-                </ColorButton>
-              </CopyToClipboard>
-            ) : null}
-            {normalAddress ? (
-              <CopyToClipboard
-                text={normalAddress}
-                onCopy={() => toast.success('Public Address Copied')}
-              >
-                <ColorButton fullWidth={true} withMargin={'0 0 0 4px'}>
-                  <Copy size={18} />
-                </ColorButton>
-              </CopyToClipboard>
-            ) : null}
             <ColorButton
               fullWidth={true}
               withMargin={'0 0 0 8px'}
@@ -128,10 +198,11 @@ export const Profile = () => {
         {open && (
           <>
             <Separation />
-            {renderLine('npub', `npub${public_key}`)}
-            {renderLine('nostr pubkey', `${public_key}`)}
-            {renderLine('Signature', 'thisisanattesstation')}
-            {renderLine('Identity Pubkey', public_key)}
+            {renderLine('npub', getWithCopyFull(npub))}
+            {renderLine('hex pubkey', getWithCopyFull(pub))}
+            {renderLine('nsec', getWithCopyFull(nsec))}
+            {renderLine('Signature', getWithCopyFull('thisisanattesstation'))}
+            {renderLine('Identity Pubkey', getWithCopyFull(public_key))}
           </>
         )}
       </Card>
